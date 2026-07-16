@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Editor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+
+  <aside id="sidebar">
+    <div id="sidebar-header">
+      <span class="sidebar-label">PROJECTS</span>
+      <button id="btn-add" title="New project">+</button>
+    </div>
+    <ul id="project-list"></ul>
+  </aside>
+
+  <main id="main">
+    <header id="topbar">
+      <div id="topbar-left">
+        <span id="file-name"></span>
+        <span id="dirty-dot" class="hidden">●</span>
+      </div>
+      <button id="btn-save" disabled>Save</button>
+    </header>
+
+    <div id="editor">
+      <p id="no-project">← Select a project or create one</p>
+      <div id="editor-content" class="hidden">
+        <table id="fields-table">
+          <tbody id="fields-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+</div>
+<script src="app.js"></script>
+</body>
+</html>

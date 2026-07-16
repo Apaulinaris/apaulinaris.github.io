@@ -1,0 +1,21 @@
+window.PORTFOLIO_PROJECTS.push({
+  id: 'up-in-the-clouds',
+  featured: false,
+  titlePrefix: { text: 'up in the', style: 'italic' },
+  title: 'Clouds...',
+  titleFont: 'Inter',
+  titleItalic: false,
+  titleWeight: 500,
+  titleColor: '#000000',
+  titleSize: '1.5rem',
+  detail: 'installation design, 2026',
+  archiveBlurb: 'Add a short teaser for the archive view here.',
+  tags: ['solo', 'RISD'],
+  previewImage: null,
+  detailLayout: [
+    { type: 'image', src: null, width: 'full', align: 'left', caption: null },
+    { type: 'text', content: '', width: 'full', align: 'left' },
+    { type: 'spacer', size: 'lg' },
+    { type: 'imageGrid', columns: 2, images: [{ src: null }, { src: null }] },
+  ],
+});

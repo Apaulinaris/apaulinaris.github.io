@@ -1,0 +1,37 @@
+#!/bin/bash
+# Resolve the tool's own folder (3 levels up from Contents/MacOS/)
+ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
+
+# Ensure common Python locations are in PATH
+export PATH="/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:$PATH"
+
+# Find python3
+PYTHON=""
+for candidate in python3 /usr/bin/python3 /usr/local/bin/python3 /opt/homebrew/bin/python3; do
+  if command -v "$candidate" &>/dev/null; then
+    PYTHON="$candidate"
+    break
+  fi
+done
+
+if [ -z "$PYTHON" ]; then
+  osascript -e 'display alert "Project Editor" message "python3 was not found. Make sure Python 3 is installed."'
+  exit 1
+fi
+
+# Kill any previous instance on port 3001
+lsof -ti:3001 | xargs kill -9 2>/dev/null
+sleep 0.3
+
+# Start server (always against this tool's own portfolio project — no file argument)
+"$PYTHON" "$ROOT/main.py" &
+
+# Poll until the server is up (max 8 seconds)
+for i in $(seq 1 16); do
+  if curl -s http://localhost:3001 > /dev/null 2>&1; then
+    break
+  fi
+  sleep 0.5
+done
+
+open "http://localhost:3001"

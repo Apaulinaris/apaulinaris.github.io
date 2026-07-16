@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__9b5bbbd9-0534-41d0-9681-686747477fc3__whoami",
+      "mcp__9b5bbbd9-0534-41d0-9681-686747477fc3__get_metadata",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" --max-time 5 http://127.0.0.1:3845/mcp)",
+      "mcp__9b5bbbd9-0534-41d0-9681-686747477fc3__get_screenshot",
+      "Bash(curl -L -o /private/tmp/claude-501/-Users-paulabends-Desktop-03-projects-portfolio-website-v1/77db96f2-966a-4ae6-8d08-843e25df564c/scratchpad/figma/frame_1_2.png \"https://www.figma.com/api/mcp/asset/aa4830e4-0eef-4008-bb95-a25d7eddd9a3\")",
+      "Bash(grep -in \"comment\" \"/Users/paulabends/Library/Application Support/Claude/local-agent-mode-sessions/fff56cff-19f3-4444-a809-331e6b34969d/8e5d310d-767f-4f7e-a8fb-636bd8fc0282/rpm/plugin_01VUWKAs3gYLNqeKbDtxv1Xs/skills/figma-use/references/plugin-api-standalone.d.ts\" | head -50)",
+      "mcp__9b5bbbd9-0534-41d0-9681-686747477fc3__use_figma",
+      "Bash(curl -L -s -o /private/tmp/claude-501/-Users-paulabends-Desktop-03-projects-portfolio-website-v1/77db96f2-966a-4ae6-8d08-843e25df564c/scratchpad/figma/frame_6_36.png \"https://www.figma.com/api/mcp/asset/eb78bc1e-49ea-4664-bd9b-df2898ff84b8\")",
+      "Bash(curl -L -s -o /private/tmp/claude-501/-Users-paulabends-Desktop-03-projects-portfolio-website-v1/77db96f2-966a-4ae6-8d08-843e25df564c/scratchpad/figma/frame_6_71.png \"https://www.figma.com/api/mcp/asset/43f4ddce-a276-4133-8f89-e539a57ea362\")",
+      "mcp__9b5bbbd9-0534-41d0-9681-686747477fc3__get_variable_defs",
+      "Bash(python3 -)"
+    ]
+  }
+}

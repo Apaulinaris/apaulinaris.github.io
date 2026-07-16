@@ -1,0 +1,577 @@
+/* ---------------------------------------------------------------------
+   Design tokens
+   All layout widths/gaps/type sizes live here as custom properties using
+   relative units (rem / fr / %) on purpose — a future mobile breakpoint
+   only needs to override the tokens + the .page grid, not rewrite rules.
+--------------------------------------------------------------------- */
+:root {
+  --color-black: #000;
+  --color-white: #fff;
+  --color-accent-blue: #15a9e9;
+  --color-sage: #afcbb2; /* "Ash Grey" from Paul's palette */
+  --color-placeholder-bg: #d9d9d9;
+  --color-tag-border: #000;
+
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-serif: 'Chiron Sung HK', Georgia, serif;
+  --font-script: 'Mea Culpa', cursive;
+
+  /* Type scale: every step is the previous one × 1.6, for an organic
+     visual hierarchy. Inter and Chiron Sung HK each have their own
+     smallest step because Chiron reads visually lighter than Inter at
+     the same pixel size — it gets +1px (16 vs 15) to compensate, then
+     scales the same way from there. Keep every font-size on this scale;
+     don't introduce one-off pixel values. */
+  --fs-inter-1: 0.9375rem;  /* 15px   — Inter base (bio, buttons, records) */
+  --fs-inter-2: 1.5rem;     /* 24px   — Inter × 1.6 ("Project Archive", record-prefix-style titles) */
+  --fs-chiron-1: 1rem;      /* 16px   — Chiron base (caption, bracket detail, headings) */
+  --fs-chiron-2: 1.6rem;    /* 25.6px — Chiron × 1.6 (project titles) */
+  --fs-script: 4rem;        /* ~64px  "Stahlbeton" script accent — not on this scale */
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+
+  --col-left-width: 1fr;
+  --col-right-width: 1fr;
+  --page-padding: 2.5rem;
+  --gap-sm: 0.5rem;
+  --gap-md: 1rem;
+  --gap-lg: 2rem;
+  --gap-block: calc(var(--gap-lg) * 4.5); /* space between major blocks (bio / education / experience / skills) */
+
+  --radius-pill: 999px;
+  --transition-fast: 180ms ease;
+  --transition-medium: 320ms ease;
+}
+
+/* ---------------------------------------------------------------------
+   Reset / base
+--------------------------------------------------------------------- */
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--fs-inter-1);
+  font-weight: var(--fw-regular);
+  color: var(--color-black);
+  background: var(--color-white);
+  -webkit-font-smoothing: antialiased;
+}
+
+h2 { margin: 0; font-weight: 400; }
+p { margin: 0; }
+ul { list-style: none; margin: 0; padding: 0; }
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+a { color: inherit; text-decoration: none; }
+
+/* ---------------------------------------------------------------------
+   Page grid — two columns, isolated in one place so a later @media
+   breakpoint can redefine grid-template-areas to stack them.
+--------------------------------------------------------------------- */
+.page {
+  display: grid;
+  grid-template-columns: var(--col-left-width) var(--col-right-width);
+  grid-template-areas: "left right";
+  height: 100vh;
+  height: 100dvh;
+  position: relative;
+}
+
+/* Divider between columns. Lives on .page (which never scrolls) rather
+   than inside .col-right (which does) — anchoring it to a scrolling
+   container was making it drift with the scroll position. Assumes the
+   two grid tracks are equal width with no gap between them (currently
+   true: 1fr 1fr, no grid-gap) — revisit the 50% if that ever changes. */
+.page::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: var(--gap-lg);
+  bottom: var(--gap-lg);
+  width: 1px;
+  background: var(--color-black);
+}
+
+.col {
+  min-height: 0; /* allow inner overflow-y: auto to work inside a grid track */
+  padding: var(--page-padding);
+}
+
+.col-left {
+  grid-area: left;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.col-left[data-view="detail"],
+.col-left[data-view="archive"] {
+  overflow-y: auto;
+}
+
+.col-right {
+  grid-area: right;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-block);
+}
+
+/* ---------------------------------------------------------------------
+   Shared bits
+--------------------------------------------------------------------- */
+.caption {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: var(--fs-chiron-1);
+  font-weight: var(--fw-regular);
+  margin-bottom: var(--gap-md);
+}
+
+.media-placeholder {
+  background: var(--color-placeholder-bg);
+  width: 100%;
+}
+
+.back-control {
+  align-self: flex-start;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: var(--fs-chiron-1);
+  font-weight: var(--fw-regular);
+  margin-bottom: var(--gap-md);
+  transition: opacity var(--transition-fast);
+}
+.back-control:hover { opacity: 0.6; }
+
+/* ---------------------------------------------------------------------
+   Home view — preview slot
+--------------------------------------------------------------------- */
+.preview-slot {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin-bottom: var(--gap-md);
+  position: relative;
+}
+
+.preview-slot .preview-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* no-op on the placeholder div, fits a real image without cropping */
+  opacity: 0;
+  transition: opacity var(--transition-medium);
+}
+
+.preview-slot .preview-layer.is-visible {
+  opacity: 1;
+}
+
+/* ---------------------------------------------------------------------
+   Project list (shared by home + archive)
+--------------------------------------------------------------------- */
+.project-list {
+  flex: 0 0 auto;
+}
+
+.project-row {
+  border-bottom: 1px solid var(--color-black);
+}
+
+/* Fixed height lives on the trigger itself (not on .project-row) so it
+   applies identically in both views: for home rows the row IS just the
+   trigger, so the row's visible height matches exactly; for archive rows
+   the trigger sits above the separate .accordion sibling, which still
+   grows the <li> freely on hover. Overflow stays visible on purpose — an
+   oversized title (Stahlbeton) is allowed to visually spill above/below
+   the fixed box; it just doesn't get to change the row's own height.
+   Horizontal overflow is clipped by .col-left instead, so it disappears
+   at the column boundary, not mid-row. */
+.project-row-trigger {
+  width: 100%;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  white-space: nowrap; /* never wrap to a second line — overflow is clipped at the column edge instead */
+}
+
+.project-title-prefix {
+  font-family: var(--font-serif);
+  font-size: var(--fs-chiron-2);
+  font-weight: var(--fw-regular); /* Chiron Sung HK is always weight 400 */
+}
+.project-title-prefix.style-italic { font-style: italic; }
+.project-title-prefix.style-plain {
+  font-family: var(--font-sans);
+  font-size: var(--fs-inter-2);
+  font-weight: var(--fw-semibold);
+}
+
+/* Real project titles are fully free-form (any font/weight/style/color/
+   size) and rendered via inline style — see titleInlineStyle() in
+   js/main.js — so this class only still matters for the one hardcoded,
+   non-project title: the "Project Archive" control row below. */
+.project-title {
+  font-family: var(--font-serif);
+  font-size: var(--fs-chiron-2);
+  font-weight: var(--fw-regular);
+}
+.project-title.style-plain {
+  font-family: var(--font-sans);
+  font-size: var(--fs-inter-2);
+  font-weight: var(--fw-medium); /* deliberately lighter — "Project Archive" isn't meant to stand out */
+}
+
+.project-detail {
+  font-family: var(--font-serif);
+  font-size: var(--fs-chiron-1);
+  font-weight: var(--fw-regular);
+  display: inline-flex;
+  align-items: baseline;
+  white-space: nowrap;
+}
+
+.detail-track {
+  display: inline-block;
+  width: 7em;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+
+.detail-text {
+  display: inline-block;
+  white-space: nowrap;
+  animation: marquee-pingpong 6s ease-in-out infinite;
+}
+
+@keyframes marquee-pingpong {
+  0%, 15%   { transform: translateX(0); }
+  50%, 65%  { transform: translateX(calc(-100% + 7em)); }
+  100%      { transform: translateX(0); }
+}
+
+.project-arrow {
+  margin-left: auto;
+  opacity: 0;
+  transform: translateX(-0.4em);
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.project-row:hover .project-arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.project-row.archive-control {
+  cursor: pointer;
+}
+
+/* ---------------------------------------------------------------------
+   Archive view — inline hover accordion
+--------------------------------------------------------------------- */
+.archive-row .accordion {
+  display: grid;
+  grid-template-columns: 8rem 1fr;
+  gap: var(--gap-md);
+  align-items: start;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height var(--transition-medium), opacity var(--transition-medium), padding var(--transition-medium);
+}
+
+.archive-row:hover .accordion {
+  max-height: 12rem;
+  opacity: 1;
+  padding-bottom: 1em;
+}
+
+.accordion-media {
+  aspect-ratio: 4 / 3;
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* no-op on the placeholder div, fits a real image without cropping */
+  display: block;
+}
+
+.accordion-blurb {
+  font-size: var(--fs-inter-1);
+  font-weight: var(--fw-regular);
+  margin-bottom: 0.5em;
+}
+
+.accordion-tags {
+  display: flex;
+  gap: 0.5em;
+  flex-wrap: wrap;
+}
+
+.tag {
+  font-family: var(--font-serif);
+  font-size: var(--fs-chiron-1);
+  font-weight: var(--fw-regular); /* Chiron Sung HK is always weight 400 */
+  border: 1px solid var(--color-tag-border);
+  border-radius: var(--radius-pill);
+  padding: 0.05em 0.75em;
+}
+
+/* ---------------------------------------------------------------------
+   Detail view
+   Body content (everything below the heading) is a sequence of typed
+   blocks — see renderDetailBlock() in js/main.js. Each project's
+   `detailLayout` array picks its own order/widths/whitespace, so this
+   section only defines the generic per-type + width/align/spacer
+   utilities, not one fixed page template.
+--------------------------------------------------------------------- */
+.detail-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5em;
+  border-top: 1px solid var(--color-black);
+  padding-top: var(--gap-md);
+  margin-bottom: var(--gap-lg);
+}
+
+.detail-blocks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-lg);
+}
+
+/* Real <img>s size to their own natural aspect ratio by default — fully
+   visible, nothing cropped — capped so a very tall image never dominates
+   the view. The gray placeholder div (no src yet) has no intrinsic size
+   of its own, so it keeps a fallback aspect-ratio box below. */
+.detail-blocks img,
+.detail-blocks video {
+  width: 100%;
+  height: auto;
+  max-height: 65vh;
+  display: block;
+}
+
+/* Explicit opt-in to cropping, e.g. for uniform imageGrid tiles — set
+   `fit: 'cover'` on a block/image to apply this. */
+.db-fit-cover {
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.detail-description {
+  font-size: var(--fs-inter-1);
+  font-weight: var(--fw-regular);
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.db-caption {
+  font-size: var(--fs-inter-1);
+  font-style: italic;
+  margin-top: 0.4em;
+}
+
+/* Width/align utilities, shared by .db-image and .db-text. A block
+   narrower than "full" combined with an align value is what creates
+   deliberate whitespace beside it. */
+.db-width-full { width: 100%; }
+.db-width-large { width: 75%; }
+.db-width-medium { width: 50%; }
+.db-width-small { width: 33%; }
+
+.db-align-left { margin-right: auto; }
+.db-align-center { margin-left: auto; margin-right: auto; }
+.db-align-right { margin-left: auto; }
+
+/* Only meaningful inside a .db-row (align-self is a no-op in normal flow) —
+   pins a block to the bottom of the row instead of the top default. */
+.db-valign-bottom { align-self: flex-end; }
+
+/* Fallback box for the "no image set yet" placeholder only — a real <img>
+   sizes to its own natural ratio instead (see `.detail-blocks img` above). */
+.db-image .media-placeholder {
+  aspect-ratio: 3 / 4;
+}
+
+/* Explicit side-by-side layout — e.g. a narrow image + narrow text pair.
+   Children keep their own db-width and db-align classes, which resolve
+   correctly against this flex row with no extra width logic needed. */
+.db-row {
+  display: flex;
+  gap: var(--gap-lg);
+  align-items: flex-start;
+}
+.db-row > .db {
+  flex-shrink: 0;
+}
+
+.db-grid {
+  display: grid;
+  gap: var(--gap-md);
+}
+.db-grid[data-columns="2"] { grid-template-columns: repeat(2, 1fr); }
+.db-grid[data-columns="3"] { grid-template-columns: repeat(3, 1fr); }
+
+.db-grid .media-placeholder {
+  aspect-ratio: 1 / 1;
+}
+
+/* Explicit vertical whitespace between blocks — sizes map straight onto
+   the existing spacing scale rather than introducing new magic numbers. */
+.db-spacer-sm { height: var(--gap-sm); }
+.db-spacer-md { height: var(--gap-md); }
+.db-spacer-lg { height: var(--gap-lg); }
+.db-spacer-block { height: var(--gap-block); }
+
+/* ---------------------------------------------------------------------
+   Right column
+--------------------------------------------------------------------- */
+.bio { display: flex; flex-direction: column; gap: var(--gap-md); }
+
+.bio-text {
+  font-size: var(--fs-inter-1);
+  font-weight: var(--fw-regular);
+  line-height: 1.5;
+  max-width: calc(100% * 5 / 6);
+}
+
+.bio-actions {
+  display: flex;
+  gap: var(--gap-sm);
+  flex-wrap: wrap;
+}
+
+.pill-button {
+  border: 1px solid var(--color-black);
+  border-radius: var(--radius-pill);
+  padding: 0.5em 1.1em;
+  font-family: var(--font-serif);
+  font-size: var(--fs-chiron-1);
+  font-weight: var(--fw-regular); /* Chiron Sung HK is always weight 400 */
+  transition: background-color var(--transition-fast);
+}
+
+/* The arrow/download glyph stays in its original styling, not Chiron */
+.pill-arrow {
+  font-family: var(--font-sans);
+  font-size: var(--fs-inter-1);
+  font-weight: var(--fw-medium);
+}
+
+.pill-button:hover {
+  background-color: var(--color-sage);
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-block);
+  flex: 1 1 auto;
+}
+
+.details-row {
+  display: grid;
+  gap: var(--gap-lg);
+}
+
+/* Education: text on the left, thumbnails on the right */
+.details-row--education {
+  grid-template-columns: 1fr 8rem;
+}
+.details-row--education .record-list { text-align: left; }
+
+/* Experience: portrait on the left, text on the right (unchanged from before) */
+.details-row--experience {
+  grid-template-columns: 8rem 1fr;
+}
+.details-row--experience .record-list { text-align: right; }
+
+.details-media {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-md);
+}
+
+/* A very light, non-directional (no offset — pure blur) shadow, shared by
+   both ID thumbnails so they read as physical cards sitting on the page.
+   filter: drop-shadow (not box-shadow) — these are transparent-background
+   PNGs, and drop-shadow follows the actual opaque pixels (the card shape)
+   instead of the element's full rectangular box. */
+.thumb-shadow {
+  filter: drop-shadow(0 0 0.6rem rgba(0, 0, 0, 0.16));
+}
+
+/* Real photos, not placeholders — sized to their own natural aspect ratio
+   rather than a fixed box, so nothing gets stretched or cropped. */
+.details-media--thumbs img.thumb {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.details-media--portrait {
+  position: relative; /* lets the (intentionally oversized) gif overlap the text column next to it */
+}
+
+.details-media--portrait img.portrait {
+  width: 20rem;
+  max-width: none;
+  height: auto;
+  display: block;
+  position: relative;
+  z-index: 1;
+  margin-top: -50px;
+}
+
+.record-list h2 {
+  font-family: var(--font-sans);
+  font-style: italic;
+  font-size: var(--fs-inter-1);
+  font-weight: var(--fw-semibold);
+  margin-bottom: var(--gap-sm);
+}
+
+/* Inline text links (record titles/subs starting with "@") — no visual
+   distinction from plain text except an underline on hover. */
+.text-link:hover {
+  text-decoration: underline;
+}
+
+.record { margin-bottom: 0.75em; }
+.record-title { font-size: var(--fs-inter-1); font-weight: var(--fw-medium); }
+.record-sub { font-size: var(--fs-inter-1); font-weight: var(--fw-medium); }
+.record-date { font-size: var(--fs-inter-1); font-weight: var(--fw-regular); font-style: italic; }
+
+/* Abitur entry deliberately recedes visually — title/sub drop to regular weight */
+.record--muted .record-title,
+.record--muted .record-sub {
+  font-weight: var(--fw-regular);
+}
+
+.skills {
+  font-size: var(--fs-inter-2);
+  font-weight: var(--fw-regular);
+  text-align: center;
+  font-style: normal;
+  line-height: 1.5;
+}
+
+.skills-label {
+  font-weight: var(--fw-semibold);
+  font-style: italic;
+}
