@@ -112,7 +112,9 @@
     }).join('');
 
     return (
-      '<p class="caption">Paul Abends, integrated Design and Design Research</p>' +
+      '<button class="caption caption-trigger" type="button" data-action="open-imprint">' +
+        '© Paul Abends, integrated Design and Design Research' +
+      '</button>' +
       '<div class="preview-slot" id="preview-slot">' + previewLayers + '</div>' +
       '<ul class="project-list" id="project-list">' +
         rows +
@@ -209,12 +211,37 @@
     );
   }
 
+  // The © caption opens this — content lives in imprint.js (window.PORTFOLIO_IMPRINT)
+  // instead of being hardcoded here, so it can be edited without touching any code.
+  function renderImprint() {
+    var data = window.PORTFOLIO_IMPRINT;
+    if (!data) return '<button class="back-control" type="button" data-action="go-home">← back</button>';
+    var sections = (data.sections || []).map(function (section) {
+      var lines = (section.lines || []).map(function (line) {
+        return '<p class="imprint-line">' + escapeHtml(line) + '</p>';
+      }).join('');
+      return (
+        '<div class="imprint-section">' +
+          '<h3 class="imprint-section-title">' + escapeHtml(section.title) + '</h3>' +
+          lines +
+        '</div>'
+      );
+    }).join('');
+    return (
+      '<button class="back-control" type="button" data-action="go-home">← back</button>' +
+      '<div class="detail-heading"><span class="project-title">' + escapeHtml(data.heading || 'Imprint') + '</span></div>' +
+      '<div class="detail-blocks">' + sections + '</div>'
+    );
+  }
+
   function render() {
     colLeft.dataset.view = state.view;
     if (state.view === 'detail') {
       colLeft.innerHTML = renderDetail(findProject(state.activeProjectId));
     } else if (state.view === 'archive') {
       colLeft.innerHTML = renderArchive();
+    } else if (state.view === 'imprint') {
+      colLeft.innerHTML = renderImprint();
     } else {
       colLeft.innerHTML = renderHome();
     }
@@ -228,6 +255,12 @@
 
   function openArchive() {
     state.view = 'archive';
+    state.activeProjectId = null;
+    render();
+  }
+
+  function openImprint() {
+    state.view = 'imprint';
     state.activeProjectId = null;
     render();
   }
@@ -247,6 +280,7 @@
     if (action === 'open-archive') openArchive();
     else if (action === 'go-home') goHome();
     else if (action === 'open-detail') openDetail(trigger.dataset.projectId);
+    else if (action === 'open-imprint') openImprint();
   });
 
   // Home hover: swap which placeholder shows in the top preview slot.

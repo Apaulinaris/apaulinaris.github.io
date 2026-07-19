@@ -119,7 +119,8 @@ a { color: inherit; text-decoration: none; }
 }
 
 .col-left[data-view="detail"],
-.col-left[data-view="archive"] {
+.col-left[data-view="archive"],
+.col-left[data-view="imprint"] {
   overflow-y: auto;
 }
 
@@ -141,6 +142,20 @@ a { color: inherit; text-decoration: none; }
   font-weight: var(--fw-regular);
   margin-bottom: var(--gap-md);
 }
+
+/* .caption is also used on the home-view trigger button that opens the
+   Imprint view — this just strips the default button chrome back down to
+   plain text so it reads identically to the non-interactive version. */
+.caption-trigger {
+  display: block;
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+.caption-trigger:hover { opacity: 0.6; }
 
 .media-placeholder {
   background: var(--color-placeholder-bg);
@@ -437,6 +452,26 @@ a { color: inherit; text-decoration: none; }
 .db-spacer-md { height: var(--gap-md); }
 .db-spacer-lg { height: var(--gap-lg); }
 .db-spacer-block { height: var(--gap-block); }
+
+/* ---------------------------------------------------------------------
+   Imprint view — reuses .detail-heading/.detail-blocks for the outer
+   heading + spacing rhythm; these are just the section/line styles.
+--------------------------------------------------------------------- */
+.imprint-section-title {
+  font-family: var(--font-sans);
+  font-size: var(--fs-inter-2);
+  font-weight: var(--fw-semibold);
+  margin-bottom: 0.5em;
+}
+
+.imprint-line {
+  font-size: var(--fs-inter-1);
+  font-weight: var(--fw-regular);
+  line-height: 1.5;
+}
+.imprint-line + .imprint-line {
+  margin-top: 0.3em;
+}
 
 /* ---------------------------------------------------------------------
    Right column

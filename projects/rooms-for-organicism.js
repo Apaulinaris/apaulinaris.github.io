@@ -6,7 +6,7 @@ window.PORTFOLIO_PROJECTS.push({
   titleFont: 'Chiron Sung HK',
   titleItalic: false,
   titleWeight: 400,
-  titleColor: '#000000',
+  titleColor: '#38571a',
   titleSize: '1.6rem',
   detail: 'installation, publication 2024',
   archiveBlurb: 'Add a short teaser for the archive view here.',
